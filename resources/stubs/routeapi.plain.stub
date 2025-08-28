@@ -1,0 +1,15 @@
+
+
+Route::group(['namespace' => 'App\Modules'.$nama_modul.'\Controllers','prefix'=>'api/'.$slug, 'middleware' => 'auth.api'], function () use ($slug, $module) {
+
+	Route::get('/', $module.'ApiController@index')->name($slug.'.api.read');
+
+	Route::post('/create', $module.'ApiController@store')->name($slug.'.api.create');
+
+	Route::get('/show/{id}', $module.'ApiController@show')->name($slug.'.api.read');
+
+	Route::post('/update/{id}', $module.'ApiController@update')->name($slug.'.api.update');
+
+	Route::get('/delete/{id}', $module.'ApiController@destroy')->name($slug.'.api.delete');
+
+});

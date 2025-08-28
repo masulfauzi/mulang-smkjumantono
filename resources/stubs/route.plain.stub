@@ -1,0 +1,15 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use DummyClass;
+
+Route::controller(KelasController::class)->middleware(['web','auth'])->name('selug.')->group(function(){
+	Route::get('/selug', 'index')->name('index');
+	Route::get('/selug/data', 'data')->name('data.index');
+	Route::get('/selug/create', 'create')->name('create');
+	Route::post('/selug', 'store')->name('store');
+	Route::get('/selug/{selug}', 'show')->name('show');
+	Route::get('/selug/{selug}/edit', 'edit')->name('edit');
+	Route::patch('/selug/{selug}', 'update')->name('update');
+	Route::get('/selug/{selug}/delete', 'destroy')->name('destroy');
+});

@@ -1,0 +1,130 @@
+<?php
+namespace DummyNamespace;
+
+use Illuminate\Http\Request;
+use DummyRootNamespaceHttp\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Modules\Kelas\Models\Kelas;
+use Yajra\Datatables\Datatables;
+use App\Models\Content;
+use App\Models\Log;
+use DB;
+use App\Helpers\Format;
+use Form;
+
+class DummyClass extends Controller
+{
+	protected $slug = 'selug';
+	protected $module = 'Kelas';
+	protected $title = "Title";
+
+	protected $column_title;
+	protected $ajax_field;
+	protected $validation;
+	protected $create_form;
+	protected $update_form;
+
+	public function __construct()
+	{
+		$this->middleware('auth');
+	}
+
+	public function index()
+	{
+		$data['title'] = $this->title;
+
+		// forms
+		//FormReference//
+		$data['create_form'] = array(
+			//Forms//
+		);
+		$data['update_form'] = array(
+			//FormsEdit//
+		);
+		$data['ajax_field'] = array("AjaxField");
+
+		// table
+		$data['column_title'] = array("ColumnJudul");
+		$data['table_data'] = array("AjaxField");
+		
+		// routing
+		$data['create_route'] = route($this->slug.'.post.create');
+		$data['update_route'] = route($this->slug.'.post.update', ['id'=>null]);
+		$data['delete_route'] = route($this->slug.'.delete', ['id'=>null]);
+		$data['detail_route'] = route($this->slug.'.details.read', ['id'=>null]);
+		$data['read_route']   = route($this->slug.'.data.read');
+		$data['create_button'] = Content::actionButton($data['title'], 'create');
+		
+		return view('Kelas::selug', $data);
+	}
+
+	public function getData(Datatables $datatables, Request $request)
+	{
+		$data =  Kelas::getData();
+
+		$datatables = Datatables::of($data);
+
+		return $datatables
+			->editColumn('created_at', function ($data) {
+				return Format::tanggal($data->created_at, true);
+			})
+			->addColumn('action', function ($data) {
+				$update = Content::actionButton($this->title, 'update', $data->id);
+				$delete = Content::actionButton($this->title, 'delete', $data->id);
+				return '<div class="button-list" aria-label="User Action">'.$update.$delete.'</div>' ;
+			})
+			->rawColumns(['action'])
+			->make(true);
+	}
+
+	function postCreate(Request $request)
+	{
+		$validation = array(
+			//FormValidation//
+		);
+		$this->validate($request, $validation);
+
+		$selug = new Kelas();
+		//ModelField//
+		$selug->created_by = Auth::user()->id;
+		$selug->save();
+
+		Log::aktivitas('Menambah '.$this->title.' ID = '.$selug->id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil ditambahkan!');
+	}
+
+	public function details($id)
+	{
+		return $data['selug'] = Kelas::find($id)->toJson();
+
+	}
+
+	public function postUpdate(Request $request)
+	{
+		$validation = array(
+			//FormValidation//
+		);
+		$this->validate($request, $validation);
+
+		$selug = Kelas::find($request->input('edit_id'));
+		//ModelField//
+		$selug->updated_by = Auth::user()->id;
+		$selug->save();
+
+		Log::aktivitas('Mengubah '.$this->title.' ID = '.$selug->id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil diubah!');
+	}
+
+	public function delete($id)
+	{
+		$selug = Kelas::find($id);
+		$selug->deleted_by = Auth::user()->id;
+		$selug->save();
+
+		Kelas::destroy($id);
+
+		Log::aktivitas('Menghapus '.$this->title.' ID = '.$id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil dihapus!');
+	}
+
+}

@@ -1,0 +1,86 @@
+<?php
+namespace DummyNamespace;
+
+use DB;
+use App\Helpers\Format;
+use Form;
+use App\Models\Log;
+use App\Models\Content;
+use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
+use App\Modules\Kelas\Models\Kelas;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use DummyRootNamespaceHttp\Controllers\Controller;
+
+class DummyClass extends Controller
+{
+	protected $slug = 'selug';
+	protected $module = 'Kelas';
+	protected $title = "Kelas";
+
+	public function index()
+    {
+        $data['success'] = true;
+        $data['message'] = 'Berhasil ambil data selug';
+        $data['data']    = Kelas::getData();
+
+        return Response::json($data);
+	}
+	
+	public function store(Request $request)
+    {
+		$valid = Validator::make($request->all(), [
+			//FormValidation//
+		]);
+
+        if($valid->fails()){
+            return Response::json(['message' => implode(', ',$valid->messages()->all()) , 'success' => false, 'data' => []]);
+        }
+        
+        $selug = new Kelas();
+        //ModelField//$selug->created_by = Auth::guard('api')->user()->id;
+		$selug->save();
+
+        Log::aktivitasApi('API: Menambah '.$this->title.' ID = '.$selug->id, Auth::guard('api')->user()->id);
+		return Response::json(['message' => 'Berhasil tambah data '.$this->title, 'success' => true, 'data' => []]);
+	}
+
+	public function show($id)
+    {
+        $obj = Kelas::findOrFail($id);
+
+        return Response::json(['message' => 'Berhasil ambil detail '.$this->title , 'success' => true, 'data' => $obj]);
+    }
+
+	public function update(Request $request, $id)
+	{
+		$valid = Validator::make($request->all(), [
+			//FormValidation//
+		]);
+
+        if($valid->fails()){
+            return Response::json(['message' => implode(', ',$valid->messages()->all()) , 'success' => false, 'data' => []]);
+        }
+        
+        $selug = Kelas::findOrFail($id);
+        //ModelField//$selug->updated_by = Auth::guard('api')->user()->id;
+		$selug->save();
+
+        Log::aktivitasApi('API: Mengubah '.$this->title.' ID = '.$selug->id, Auth::guard('api')->user()->id);
+		return Response::json(['message' => 'Berhasil ubah data '.$this->title , 'success' => true, 'data' => []]);
+	}
+
+	public function destroy(Request $request, $id)
+    {
+        $obj = Kelas::findOrFail($id);
+		$obj->deleted_by = Auth::guard('api')->user()->id;
+        $obj->save();
+        
+        Kelas::destroy($id);
+
+		return Response::json(['message' => 'Berhasil menghapus data '.$this->title , 'success' => true, 'data' => []]);
+    }
+
+}

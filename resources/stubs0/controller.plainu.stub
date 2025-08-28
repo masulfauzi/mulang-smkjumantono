@@ -1,0 +1,91 @@
+<?php
+namespace DummyNamespace;
+
+use App\Http\Controllers\Controller;
+
+
+class DummyClass extends Controller
+{
+
+	public function __construct()
+	{
+		$this->middleware('auth');
+	}
+
+	public function index()
+	{
+		$data['title'] = "Title";
+
+		return view('Kelas::selug', $data);
+	}
+
+	public function data(Datatables $datatables, Request $request)
+	{
+		$data =  Kelas::getData();
+
+		$datatables = Datatables::of($data);
+
+		return $datatables
+			->editColumn('created_at', function ($data) {
+				return Format::tanggal($data->created_at, true);
+			})
+			->addColumn('action', function ($data) {
+				$update = Content::actionButton($this->title, 'update', $data->id);
+				$delete = Content::actionButton($this->title, 'delete', $data->id);
+				return '<div class="button-list" aria-label="User Action">'.$update.$delete.'</div>' ;
+			})
+			->rawColumns(['action'])
+			->make(true);
+	}
+
+	function postCreate(Request $request)
+	{
+		$validation = array(
+			//FormValidation//
+		);
+		$this->validate($request, $validation);
+
+		$selug = new Kelas();
+		//ModelField//
+		$selug->created_by = Auth::user()->id;
+		$selug->save();
+
+		Log::aktivitas('Menambah '.$this->title.' ID = '.$selug->id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil ditambahkan!');
+	}
+
+	public function details($id)
+	{
+		return $data['selug'] = Kelas::find($id)->toJson();
+
+	}
+
+	public function postUpdate(Request $request)
+	{
+		$validation = array(
+			//FormValidation//
+		);
+		$this->validate($request, $validation);
+
+		$selug = Kelas::find($request->input('edit_id'));
+		//ModelField//
+		$selug->updated_by = Auth::user()->id;
+		$selug->save();
+
+		Log::aktivitas('Mengubah '.$this->title.' ID = '.$selug->id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil diubah!');
+	}
+
+	public function delete($id)
+	{
+		$selug = Kelas::find($id);
+		$selug->deleted_by = Auth::user()->id;
+		$selug->save();
+
+		Kelas::destroy($id);
+
+		Log::aktivitas('Menghapus '.$this->title.' ID = '.$id);
+		return redirect()->back()->with('message_sukses', $this->title.' berhasil dihapus!');
+	}
+
+}
