@@ -11,6 +11,7 @@ use App\Modules\Pesertadidik\Models\Pesertadidik;
 use App\Modules\Statuskehadiran\Models\Statuskehadiran;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Kelas\Models\Kelas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -213,6 +214,32 @@ class PresensiController extends Controller
 		// dd($request);
 
 		return view('Presensi::status_presensi', $data);
+	}
+
+	public function rekap_presensi(Request $request)
+	{
+		$data['kelas'] = Kelas::all()->pluck('kelas', 'id');
+		// $data['kelas']->prepend('-PILIH SALAH SATU-');
+		
+		$data['bulan'] = [
+			'01' => 'Januari',
+			'02' => 'Februari',
+			'03' => 'Maret',
+			'04' => 'April',
+			'05' => 'Mei',
+			'06' => 'Juni',
+			'07' => 'Juli',
+			'08' => 'Agustus',
+			'09' => 'September',
+			'10' => 'Oktober',
+			'11' => 'November',
+			'12' => 'Desember'
+		];
+
+		$data['kelas_terpilih'] = $request->get('id_kelas');
+		$data['bulan_terpilih'] = $request->get('bulan');
+
+		return view('Presensi::rekap_presensi', array_merge($data, ['title' => $this->title]));
 	}
 
 }
