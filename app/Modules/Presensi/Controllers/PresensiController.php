@@ -218,16 +218,32 @@ class PresensiController extends Controller
 
 	public function rekap_presensi(Request $request)
 	{
+		$data['kelas_terpilih'] = $request->get('id_kelas');
+		$data['bulan_terpilih'] = $request->get('bulan');
+
+		$filter_bulan = date('Y') . '-' . $request->get('bulan') . '%';
+
+		// dd($filter_bulan);
+
 		$data['kelas'] = Kelas::all()->pluck('kelas', 'id');
 		// $data['kelas']->prepend('-PILIH SALAH SATU-');
 
-		$data['pesertadidik'] = Pesertadidik::join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
+		$data['pesertadidik'] = Pesertadidik::select('s.nama_siswa', 'pesertadidik.*')
+												->join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
 												->whereIdSemester(session()->get('active_semester')['id'])
 												->whereIdKelas($request->get('id_kelas'))
 												->orderBy('s.nama_siswa')
 												->get();
 
-		// dd($data['pesertadidik']);
+		$data['presensi'] = Presensi::select('j.tgl_pembelajaran', 's.status_kehadiran_pendek', 'presensi.*')
+										->join('jurnal as j', 'presensi.id_jurnal', '=', 'j.id')
+										->join('statuskehadiran as s', 'presensi.id_statuskehadiran', '=', 's.id')
+										->whereIn('id_pesertadidik', $data['pesertadidik']->pluck('id'))
+										->where('j.tgl_pembelajaran', 'LIKE', $filter_bulan)
+										// ->limit(10)
+										->get();
+
+		// dd($data['presensi']);
 		
 		$data['bulan'] = [
 			'01' => 'Januari',
@@ -244,8 +260,6 @@ class PresensiController extends Controller
 			'12' => 'Desember'
 		];
 
-		$data['kelas_terpilih'] = $request->get('id_kelas');
-		$data['bulan_terpilih'] = $request->get('bulan');
 
 		return view('Presensi::rekap_presensi', array_merge($data, ['title' => $this->title]));
 	}

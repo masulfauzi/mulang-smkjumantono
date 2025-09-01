@@ -49,8 +49,14 @@
                         <table class="table" id="table1">
                             <thead>
                                 <tr>
-                                    <th width="15">No</th>
-                                    <td>Nama</td>
+                                    <th width="15" rowspan="2">No</th>
+                                    <td rowspan="2">Nama</td>
+                                    <td colspan="31">Tanggal</td>
+                                </tr>
+                                <tr>
+                                    @for ($i = 1; $i <= 31; $i++)
+                                        <td>{{ $i }}</td>
+                                    @endfor
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,6 +67,34 @@
                                     <tr>
                                         <td>{{ $no++ }}</td>
                                         <td>{{ $p->nama_siswa }}</td>
+                                        @for ($i = 1; $i <= 31; $i++)
+                                            @php
+                                                if ($i < 10) {
+                                                    $tgl = date('Y') . '-' . $bulan_terpilih . '-' . '0' . $i;
+                                                } else {
+                                                    $tgl = date('Y') . '-' . $bulan_terpilih . '-' . $i;
+                                                }
+                                            @endphp
+
+                                            @if ($data = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'H')->first())
+                                                <td>{{ $data->status_kehadiran_pendek }}</td>
+                                            @else
+                                                @if ($data2 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'S')->first())
+                                                    <td>{{ $data2->status_kehadiran_pendek }}</td>
+                                                @else
+                                                    @if ($data3 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'I')->first())
+                                                        <td>{{ $data3->status_kehadiran_pendek }}</td>
+                                                    @else
+                                                        @if ($data4 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'A')->first())
+                                                            <td>{{ $data4->status_kehadiran_pendek }}</td>
+                                                        @else
+                                                            <td></td>
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                            @endif
+                                        @endfor
+
                                     </tr>
                                 @endforeach
                             </tbody>
