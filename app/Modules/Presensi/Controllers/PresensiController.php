@@ -220,6 +220,14 @@ class PresensiController extends Controller
 	{
 		$data['kelas'] = Kelas::all()->pluck('kelas', 'id');
 		// $data['kelas']->prepend('-PILIH SALAH SATU-');
+
+		$data['pesertadidik'] = Pesertadidik::join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
+												->whereIdSemester(session()->get('active_semester')['id'])
+												->whereIdKelas($request->get('id_kelas'))
+												->orderBy('s.nama_siswa')
+												->get();
+
+		// dd($data['pesertadidik']);
 		
 		$data['bulan'] = [
 			'01' => 'Januari',

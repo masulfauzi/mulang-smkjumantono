@@ -50,15 +50,20 @@
                             <thead>
                                 <tr>
                                     <th width="15">No</th>
-                                    <td>Jurnal</td>
-                                    <td>Pesertadidik</td>
-                                    <td>Statuskehadiran</td>
-                                    <td>Catatan</td>
-
-                                    <th width="20%">Aksi</th>
+                                    <td>Nama</td>
                                 </tr>
                             </thead>
-
+                            <tbody>
+                                @php
+                                    $no = 1;
+                                @endphp
+                                @foreach ($pesertadidik as $p)
+                                    <tr>
+                                        <td>{{ $no++ }}</td>
+                                        <td>{{ $p->nama_siswa }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
