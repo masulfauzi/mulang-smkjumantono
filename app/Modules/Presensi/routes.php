@@ -8,6 +8,7 @@ Route::controller(PresensiController::class)->middleware(['web', 'auth'])->name(
     Route::get('/presensijurnal/{jurnal}', 'presensi_jurnal')->name('jurnal.index');
     Route::post('/presensijurnal', 'presensi_jurnal_store')->name('jurnal.store');
     Route::get('/rekappresensi', 'rekap_presensi')->name('rekap.index');
+    Route::get('/rekappresensi/export', 'export_presensi')->name('export.index');
 
     Route::post('/statussiswa', 'get_siswa_kehadiran')->name('dashboard.index');
 

@@ -15,6 +15,8 @@ use App\Modules\Kelas\Models\Kelas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PresensiController extends Controller
 {
@@ -229,22 +231,22 @@ class PresensiController extends Controller
 		// $data['kelas']->prepend('-PILIH SALAH SATU-');
 
 		$data['pesertadidik'] = Pesertadidik::select('s.nama_siswa', 'pesertadidik.*')
-												->join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
-												->whereIdSemester(session()->get('active_semester')['id'])
-												->whereIdKelas($request->get('id_kelas'))
-												->orderBy('s.nama_siswa')
-												->get();
+			->join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
+			->whereIdSemester(session()->get('active_semester')['id'])
+			->whereIdKelas($request->get('id_kelas'))
+			->orderBy('s.nama_siswa')
+			->get();
 
 		$data['presensi'] = Presensi::select('j.tgl_pembelajaran', 's.status_kehadiran_pendek', 'presensi.*')
-										->join('jurnal as j', 'presensi.id_jurnal', '=', 'j.id')
-										->join('statuskehadiran as s', 'presensi.id_statuskehadiran', '=', 's.id')
-										->whereIn('id_pesertadidik', $data['pesertadidik']->pluck('id'))
-										->where('j.tgl_pembelajaran', 'LIKE', $filter_bulan)
-										// ->limit(10)
-										->get();
+			->join('jurnal as j', 'presensi.id_jurnal', '=', 'j.id')
+			->join('statuskehadiran as s', 'presensi.id_statuskehadiran', '=', 's.id')
+			->whereIn('id_pesertadidik', $data['pesertadidik']->pluck('id'))
+			->where('j.tgl_pembelajaran', 'LIKE', $filter_bulan)
+			// ->limit(10)
+			->get();
 
 		// dd($data['presensi']);
-		
+
 		$data['bulan'] = [
 			'01' => 'Januari',
 			'02' => 'Februari',
@@ -262,6 +264,34 @@ class PresensiController extends Controller
 
 
 		return view('Presensi::rekap_presensi', array_merge($data, ['title' => $this->title]));
+	}
+
+	public function export_presensi(Request $request)
+	{
+		$pesertadidik = Pesertadidik::select('s.nama_siswa', 'pesertadidik.*')
+			->join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
+			->whereIdSemester(session()->get('active_semester')['id'])
+			->whereIdKelas($request->get('id_kelas'))
+			->orderBy('s.nama_siswa')
+			->get();
+
+		// dd($pesertadidik);
+
+		$spreadsheet = new Spreadsheet();
+		$sheet = $spreadsheet->getActiveSheet();
+
+		$sheet->setCellValue('A1', 'Hello');
+		$sheet->setCellValue('B1', 'World!');
+
+
+		$filename = "exported_data.xlsx";
+
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		$writer = new Xlsx($spreadsheet);
+		$writer->save('php://output');
 	}
 
 }

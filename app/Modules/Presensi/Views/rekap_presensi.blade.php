@@ -31,14 +31,19 @@
                         <div class="col-12">
                             <form action="" method="get" class="form form-horizontal">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         {{ Form::select('id_kelas', $kelas, $kelas_terpilih, ['class' => 'form-control select2']) }}
                                     </div>
                                     <div class="col-md-4">
                                         {{ Form::select('bulan', $bulan, $bulan_terpilih, ['class' => 'form-control select2']) }}
                                     </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary">Lihat Data</button>
+                                    <div class="col-md-3">
+                                        <button type="submit" class="btn btn-primary">Lihat Data</button>
+                                        @if ($kelas_terpilih)
+                                            <a target="_blank"
+                                                href="{{ route('presensi.export.index', ['id_kelas' => $kelas_terpilih, 'bulan' => $bulan_terpilih]) }}"
+                                                class="btn btn-secondary">Export</a>
+                                        @endif
                                     </div>
                                 </div>
                             </form>
@@ -52,16 +57,23 @@
                                     <th width="15" rowspan="2">No</th>
                                     <td rowspan="2">Nama</td>
                                     <td colspan="31">Tanggal</td>
+                                    <td colspan="31">Keterangan</td>
                                 </tr>
                                 <tr>
                                     @for ($i = 1; $i <= 31; $i++)
                                         <td>{{ $i }}</td>
                                     @endfor
+                                    <td>S</td>
+                                    <td>I</td>
+                                    <td>A</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
                                     $no = 1;
+                                    $sakit = 0;
+                                    $ijin = 0;
+                                    $alfa = 0;
                                 @endphp
                                 @foreach ($pesertadidik as $p)
                                     <tr>
@@ -81,12 +93,21 @@
                                             @else
                                                 @if ($data2 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'S')->first())
                                                     <td>{{ $data2->status_kehadiran_pendek }}</td>
+                                                    @php
+                                                        $sakit++;
+                                                    @endphp
                                                 @else
                                                     @if ($data3 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'I')->first())
                                                         <td>{{ $data3->status_kehadiran_pendek }}</td>
+                                                        @php
+                                                            $ijin++;
+                                                        @endphp
                                                     @else
                                                         @if ($data4 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'A')->first())
                                                             <td>{{ $data4->status_kehadiran_pendek }}</td>
+                                                            @php
+                                                                $alfa++;
+                                                            @endphp
                                                         @else
                                                             <td></td>
                                                         @endif
@@ -94,8 +115,16 @@
                                                 @endif
                                             @endif
                                         @endfor
+                                        <td>{{ $sakit }}</td>
+                                        <td>{{ $ijin }}</td>
+                                        <td>{{ $alfa }}</td>
 
                                     </tr>
+                                    @php
+                                        $sakit = 0;
+                                        $ijin = 0;
+                                        $alfa = 0;
+                                    @endphp
                                 @endforeach
                             </tbody>
                         </table>
