@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class PresensiController extends Controller
 {
@@ -275,13 +276,53 @@ class PresensiController extends Controller
 			->orderBy('s.nama_siswa')
 			->get();
 
+		$data_bulan = [
+			'01' => 'Januari',
+			'02' => 'Februari',
+			'03' => 'Maret',
+			'04' => 'April',
+			'05' => 'Mei',
+			'06' => 'Juni',
+			'07' => 'Juli',
+			'08' => 'Agustus',
+			'09' => 'September',
+			'10' => 'Oktober',
+			'11' => 'November',
+			'12' => 'Desember'
+		];
+
+		$kelas = Kelas::find($request->get('id_kelas'));
+
 		// dd($pesertadidik);
 
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();
 
-		$sheet->setCellValue('A1', 'Hello');
-		$sheet->setCellValue('B1', 'World!');
+		$sheet->setCellValue('A1', 'Rekap Presensi Bulanan');
+
+		$sheet->setCellValue('A2', 'Kelas :');
+		$sheet->setCellValue('B2', $kelas->kelas);
+
+		$sheet->setCellValue('A3', 'Bulan :');
+		$sheet->setCellValue('B3', $data_bulan[$request->get('bulan')] . ' 2025');
+
+		$sheet->setCellValue('A5', 'No');
+		$sheet->mergeCells('A5:A6');
+		$sheet->setCellValue('B5', 'Nama');
+		$sheet->mergeCells('B5:B6');
+		$sheet->setCellValue('C5', 'Tanggal');
+		$sheet->mergeCells('C5:Z5');
+
+		for ($i = 1; $i <= 31; $i++) {
+			$kolom = 3;
+			$kolom ++;
+			$namakolom = Coordinate::stringFromColumnIndex($kolom);
+			$cell = $namakolom . '6';
+			$sheet->setCellValue($cell, $i);
+		}
+
+
+
 
 
 		$filename = "exported_data.xlsx";
