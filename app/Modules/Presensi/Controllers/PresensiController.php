@@ -269,11 +269,22 @@ class PresensiController extends Controller
 
 	public function export_presensi(Request $request)
 	{
+		$filter_bulan = date('Y') . '-' . $request->get('bulan') . '%';
+		$bulan_terpilih = $request->get('bulan');
+
 		$pesertadidik = Pesertadidik::select('s.nama_siswa', 'pesertadidik.*')
 			->join('siswa as s', 'pesertadidik.id_siswa', '=', 's.id')
 			->whereIdSemester(session()->get('active_semester')['id'])
 			->whereIdKelas($request->get('id_kelas'))
 			->orderBy('s.nama_siswa')
+			->get();
+
+		$presensi = Presensi::select('j.tgl_pembelajaran', 's.status_kehadiran_pendek', 'presensi.*')
+			->join('jurnal as j', 'presensi.id_jurnal', '=', 'j.id')
+			->join('statuskehadiran as s', 'presensi.id_statuskehadiran', '=', 's.id')
+			->whereIn('id_pesertadidik', $pesertadidik->pluck('id'))
+			->where('j.tgl_pembelajaran', 'LIKE', $filter_bulan)
+			// ->limit(10)
 			->get();
 
 		$data_bulan = [
@@ -299,6 +310,7 @@ class PresensiController extends Controller
 		$sheet = $spreadsheet->getActiveSheet();
 
 		$sheet->setCellValue('A1', 'Rekap Presensi Bulanan');
+		$sheet->mergeCells('A1:Aj1');
 
 		$sheet->setCellValue('A2', 'Kelas :');
 		$sheet->setCellValue('B2', $kelas->kelas);
@@ -311,14 +323,79 @@ class PresensiController extends Controller
 		$sheet->setCellValue('B5', 'Nama');
 		$sheet->mergeCells('B5:B6');
 		$sheet->setCellValue('C5', 'Tanggal');
-		$sheet->mergeCells('C5:Z5');
+		$sheet->mergeCells('C5:AG5');
+		$sheet->setCellValue('AH5', 'Keterangan');
+		$sheet->mergeCells('AH5:AJ5');
+
+		$sheet->setCellValue('AH6', 'S');
+		$sheet->setCellValue('AI6', 'I');
+		$sheet->setCellValue('AJ6', 'A');
 
 		for ($i = 1; $i <= 31; $i++) {
-			$kolom = 3;
-			$kolom ++;
+			$kolom = 2;
+			$kolom = $kolom + $i;
 			$namakolom = Coordinate::stringFromColumnIndex($kolom);
 			$cell = $namakolom . '6';
 			$sheet->setCellValue($cell, $i);
+		}
+
+		$no = 1;
+
+		$baris = 6;
+
+		$sakit = 0;
+		$ijin = 0;
+		$alfa = 0;
+
+		foreach ($pesertadidik as $p) {
+			$baris++;
+
+			$sheet->setCellValue('A' . $baris, $no++);
+			$sheet->setCellValue('B' . $baris, $p->nama_siswa);
+
+			$kolom = 3;
+			for ($i = 1; $i <= 31; $i++) {
+				if ($i < 10) {
+					$tgl = date('Y') . '-' . $bulan_terpilih . '-' . '0' . $i;
+				} else {
+					$tgl = date('Y') . '-' . $bulan_terpilih . '-' . $i;
+				}
+
+				$namakolom = Coordinate::stringFromColumnIndex($kolom);
+
+				if ($data = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'H')->first()) {
+					$sheet->setCellValue($namakolom . $baris, $data->status_kehadiran_pendek);
+				} else {
+					if ($data2 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'S')->first()) {
+						$sheet->setCellValue($namakolom . $baris, $data2->status_kehadiran_pendek);
+						$sakit++;
+					} else {
+						if ($data3 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'I')->first()) {
+							$sheet->setCellValue($namakolom . $baris, $data3->status_kehadiran_pendek);
+							$ijin++;
+						} else {
+							if ($data4 = $presensi->where('tgl_pembelajaran', '=', $tgl)->where('id_pesertadidik', '=', $p->id)->where('status_kehadiran_pendek', '=', 'A')->first()) {
+								$sheet->setCellValue($namakolom . $baris, $data4->status_kehadiran_pendek);
+								$alfa++;
+							}
+						}
+					}
+				}
+
+				$kolom++;
+			}
+			
+			$sheet->setCellValue(Coordinate::stringFromColumnIndex($kolom) . $baris, $sakit);
+			$kolom++;
+			$sheet->setCellValue(Coordinate::stringFromColumnIndex($kolom) . $baris, $ijin);
+			$kolom++;
+			$sheet->setCellValue(Coordinate::stringFromColumnIndex($kolom) . $baris, $alfa);
+
+
+			$sakit = 0;
+			$ijin = 0;
+			$alfa = 0;
+
 		}
 
 
