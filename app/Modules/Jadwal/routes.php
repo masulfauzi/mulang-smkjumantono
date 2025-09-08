@@ -8,6 +8,7 @@ Route::controller(JadwalController::class)->middleware(['web','auth'])->name('ja
 	Route::get('/jadwal/import', 'import')->name('import.index');
 	Route::post('/jadwal/mapping_guru', 'aksi_mapping')->name('mapping_guru.store');
 	Route::get('/jadwal', 'index')->name('index');
+	Route::get('/jadwal/index', 'index_jadwal')->name('index.index');
 	Route::get('/jadwal/data', 'data')->name('data.index');
 	Route::get('/jadwal/create', 'create')->name('create');
 	Route::post('/jadwal', 'store')->name('store');
