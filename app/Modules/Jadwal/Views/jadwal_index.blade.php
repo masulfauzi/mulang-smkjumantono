@@ -51,6 +51,8 @@
                                     <td>Mapel</td>
                                     <td>Kelas</td>
                                     <td>Hari</td>
+                                    <td>Tgl Dibuat</td>
+                                    <td>Dihapus?</td>
 
                                     <th width="20%">Aksi</th>
                                 </tr>
@@ -64,6 +66,14 @@
                                         <td>{{ $item->mapel }}</td>
                                         <td>{{ $kelas[$item->id_kelas] }}</td>
                                         <td>{{ $hari[$item->id_hari] }}</td>
+                                        <td>{{ \App\Helpers\Format::tanggal($item->created_at) }}</td>
+                                        <td>
+                                            @if ($item->deleted_at)
+                                                Dihapus
+                                            @else
+                                                Tidak
+                                            @endif
+                                        </td>
 
                                         <td>
                                             {!! button('jadwal.show', '', $item->id) !!}
