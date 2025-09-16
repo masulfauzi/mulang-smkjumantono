@@ -5,6 +5,7 @@ use App\Modules\Jadwal\Controllers\JadwalController;
 
 Route::controller(JadwalController::class)->middleware(['web','auth'])->name('jadwal.')->group(function(){
 	Route::get('/jadwal_edit/{jadwal}/edit', 'edit_jadwal')->name('edit.edit');
+	Route::patch('/jadwal_edit/{jadwal}', 'update_jadwal')->name('update.update');
 	
 	Route::get('/jadwal/mapping_guru', 'mapping_guru')->name('mapping_guru.index');
 	Route::get('/jadwal/import', 'import')->name('import.index');

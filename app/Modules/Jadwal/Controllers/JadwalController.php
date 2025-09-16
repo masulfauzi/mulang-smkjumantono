@@ -316,7 +316,7 @@ class JadwalController extends Controller
 		$this->log($request, $text, ['jadwal.id' => $jadwal->id]);
 		return view('Jadwal::jadwal_update', array_merge($data, ['title' => $this->title]));
 	}
-	
+
 	public function edit_jadwal(Request $request, string $jadwal)
 	{
 		$data['jadwal'] = DB::table('jadwal')->where('id', $jadwal)->first();
@@ -345,7 +345,7 @@ class JadwalController extends Controller
 
 		$text = 'membuka form edit ' . $this->title;//.' '.$jadwal->what;
 		$this->log($request, $text, ['jadwal.id' => $data['jadwal']->id]);
-		return view('Jadwal::jadwal_update', array_merge($data, ['title' => $this->title]));
+		return view('Jadwal::jadwal_update_update', array_merge($data, ['title' => $this->title]));
 	}
 
 	public function update(Request $request, $id)
@@ -361,7 +361,7 @@ class JadwalController extends Controller
 
 		]);
 
-		$jadwal = Jadwal::find($id);
+		$jadwal = DB::table('jadwal')->where('id', $id)->first();
 		$jadwal->id_guru = $request->input("id_guru");
 		$jadwal->id_hari = $request->input("id_hari");
 		$jadwal->id_kelas = $request->input("id_kelas");
@@ -377,6 +377,39 @@ class JadwalController extends Controller
 
 		$text = 'mengedit ' . $this->title;//.' '.$jadwal->what;
 		$this->log($request, $text, ['jadwal.id' => $jadwal->id]);
+		return redirect()->back()->with('message_success', 'Jadwal berhasil diubah!');
+	}
+
+	public function update_jadwal(Request $request, $id)
+	{
+		$this->validate($request, [
+			'id_guru' => 'required',
+			'id_hari' => 'required',
+			'id_kelas' => 'required',
+			'jam_mulai' => 'required',
+			'jam_selesai' => 'required',
+			'id_mapel' => 'required',
+			'id_ruang' => 'required',
+
+		]);
+
+		DB::table('jadwal')
+			->where('id', $id)
+			->update([
+				'id_guru' => $request->input("id_guru"),
+				'id_hari' => $request->input("id_hari"),
+				'id_kelas' => $request->input("id_kelas"),
+				'jam_mulai' => $request->input("jam_mulai"),
+				'jam_selesai' => $request->input("jam_selesai"),
+				'id_mapel' => $request->input("id_mapel"),
+				'id_ruang' => $request->input("id_ruang")
+			]);
+
+		
+
+
+		$text = 'mengedit ' . $this->title;//.' '.$jadwal->what;
+		// $this->log($request, $text, ['jadwal.id' => $jadwal->id]);
 		return redirect()->back()->with('message_success', 'Jadwal berhasil diubah!');
 	}
 
