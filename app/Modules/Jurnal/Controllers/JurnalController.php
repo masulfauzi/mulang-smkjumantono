@@ -243,10 +243,11 @@ class JurnalController extends Controller
             $alfa = 0;
 			$kolom = 'C';
 
-			dd(count($pertemuan));
+			// dd(count($pertemuan));
 
 			foreach($pertemuan as $jurnal)
 			{
+				dd($jurnal);
 				$id_status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first()->id_statuskehadiran;
             	$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
 
