@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Jadwal\Controllers\JadwalController;
 
 Route::controller(JadwalController::class)->middleware(['web','auth'])->name('jadwal.')->group(function(){
+	Route::get('/jadwal_edit/{jadwal}/edit', 'edit_jadwal')->name('edit.edit');
+	
 	Route::get('/jadwal/mapping_guru', 'mapping_guru')->name('mapping_guru.index');
 	Route::get('/jadwal/import', 'import')->name('import.index');
 	Route::post('/jadwal/mapping_guru', 'aksi_mapping')->name('mapping_guru.store');

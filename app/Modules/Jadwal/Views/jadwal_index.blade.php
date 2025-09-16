@@ -77,7 +77,7 @@
 
                                         <td>
                                             {!! button('jadwal.show', '', $item->id) !!}
-                                            {!! button('jadwal.edit', $title, $item->id) !!}
+                                            {!! button('jadwal.edit.edit', $title, $item->id) !!}
                                             {!! button('jadwal.destroy', $title, $item->id) !!}
                                         </td>
                                     </tr>

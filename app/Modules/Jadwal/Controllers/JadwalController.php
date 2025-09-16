@@ -316,6 +316,37 @@ class JadwalController extends Controller
 		$this->log($request, $text, ['jadwal.id' => $jadwal->id]);
 		return view('Jadwal::jadwal_update', array_merge($data, ['title' => $this->title]));
 	}
+	
+	public function edit_jadwal(Request $request, string $jadwal)
+	{
+		$data['jadwal'] = DB::table('jadwal')->where('id', $jadwal)->first();
+
+		// dd($data['jadwal']);
+
+		$ref_guru = Guru::all()->pluck('nama', 'id');
+		$ref_hari = Hari::all()->pluck('hari', 'id');
+		$ref_kelas = Kelas::all()->pluck('kelas', 'id');
+		$ref_jampelajaran = Jampelajaran::all()->pluck('jam_pelajaran', 'id');
+		$ref_jampelajaran = Jampelajaran::all()->pluck('jam_pelajaran', 'id');
+		$ref_mapel = Mapel::all()->pluck('mapel', 'id');
+		$ref_ruang = Ruang::all()->pluck('ruang', 'id');
+		$ref_semester = Semester::all()->pluck('semester', 'id');
+
+		$data['forms'] = array(
+			'id_guru' => ['Guru', Form::select("id_guru", $ref_guru, $data['jadwal']->id_guru, ["class" => "form-control select2"])],
+			'id_hari' => ['Hari', Form::select("id_hari", $ref_hari, $data['jadwal']->id_hari, ["class" => "form-control select2"])],
+			'id_kelas' => ['Kelas', Form::select("id_kelas", $ref_kelas, $data['jadwal']->id_kelas, ["class" => "form-control select2"])],
+			'jam_mulai' => ['Jam Mulai', Form::select("jam_mulai", $ref_jampelajaran, $data['jadwal']->jam_mulai, ["class" => "form-control select2"])],
+			'jam_selesai' => ['Jam Selesai', Form::select("jam_selesai", $ref_jampelajaran, $data['jadwal']->jam_selesai, ["class" => "form-control select2"])],
+			'id_mapel' => ['Mapel', Form::select("id_mapel", $ref_mapel, $data['jadwal']->id_mapel, ["class" => "form-control select2"])],
+			'id_ruang' => ['Ruang', Form::select("id_ruang", $ref_ruang, $data['jadwal']->id_ruang, ["class" => "form-control select2"])],
+
+		);
+
+		$text = 'membuka form edit ' . $this->title;//.' '.$jadwal->what;
+		$this->log($request, $text, ['jadwal.id' => $data['jadwal']->id]);
+		return view('Jadwal::jadwal_update', array_merge($data, ['title' => $this->title]));
+	}
 
 	public function update(Request $request, $id)
 	{
