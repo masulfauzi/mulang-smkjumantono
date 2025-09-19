@@ -249,7 +249,7 @@ class JurnalController extends Controller
 			{
 				// dd($jurnal);
 				$status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first();
-				if($id_status)
+				if($status)
 				{
 					$id_status = $status->id_status_kehadiran;
 				}
