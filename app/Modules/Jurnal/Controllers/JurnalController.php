@@ -247,17 +247,19 @@ class JurnalController extends Controller
 
 			foreach($pertemuan as $jurnal)
 			{
+				
+				$id_status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first()->id_status_kehadiran;
 				// dd($jurnal);
-				$status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first();
-				if($status)
-				{
-					$id_status = $status->id_status_kehadiran;
-				}
-				else{
-					var_dump($sis->id);
-					var_dump($jurnal->id);
-					die();
-				}
+				// $status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first();
+				// if($status)
+				// {
+					// 	$id_status = $status->id_status_kehadiran;
+					// }
+					// else{
+						// 	var_dump($sis->id);
+				// 	var_dump($jurnal->id);
+				// 	die();
+				// }
 
             	$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
 
