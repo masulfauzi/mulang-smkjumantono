@@ -248,6 +248,7 @@ class JurnalController extends Controller
 				} else {
 					// $jadwal = Jadwal::find($jurnal->id_jadwal);
 					echo "Jadwal dengan ID: " . $jurnal->id_jadwal . " Tidak singkron. silahkan ubah kelas.";
+					die();
 				}
 
 				$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
