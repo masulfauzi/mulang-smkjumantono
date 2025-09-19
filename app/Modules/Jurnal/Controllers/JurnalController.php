@@ -254,7 +254,7 @@ class JurnalController extends Controller
 					$id_status = $status->id_status_kehadiran;
 				}
 				else{
-					dd($status);
+					dd($jurnal->id);
 				}
 
             	$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
