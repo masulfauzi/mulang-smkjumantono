@@ -247,13 +247,13 @@ class JurnalController extends Controller
 
 			foreach($pertemuan as $jurnal)
 			{
-				// dd($jurnal);
+				dd($jurnal);
 				$id_status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first()->id_statuskehadiran;
 				if(!$id_status)
 				{
 					dd($sis->id);
 				}
-				
+
             	$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
 
 				if($kehadiran == 'H')
