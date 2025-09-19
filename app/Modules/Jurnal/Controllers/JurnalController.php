@@ -30,7 +30,7 @@ class JurnalController extends Controller
 	use Logger;
 	protected $log;
 	protected $title = "Jurnal";
-	
+
 	public function __construct(Log $log)
 	{
 		$this->log = $log;
@@ -38,38 +38,33 @@ class JurnalController extends Controller
 
 	public function index(Request $request)
 	{
-		if(session('active_role')['id'] == '9ec7541e-5a5e-4a3a-a255-6ffb46895f46')
-		{
+		if (session('active_role')['id'] == '9ec7541e-5a5e-4a3a-a255-6ffb46895f46') {
 			return redirect(route('jurnal.guru.index'));
 		}
 
-		if($request->input('bulan') == NULL)
-		{
+		if ($request->input('bulan') == NULL) {
 			$data['bulan'] = date('m');
-		}
-		else{
+		} else {
 			$data['bulan'] = $request->input('bulan');
 		}
 
-		if($request->input('tahun') == NULL)
-		{
+		if ($request->input('tahun') == NULL) {
 			$data['tahun'] = date('Y');
-		}
-		else{
+		} else {
 			$data['tahun'] = $request->input('tahun');
 		}
 
 		$data['guru'] = Guru::query()->whereIsAktif('1')->orderBy('nama')->get();
-		
+
 		$cari = $data['tahun'] . "-" . $data['bulan'];
 		$data['jurnal'] = Jurnal::query()
-								->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
-								->where('tgl_pembelajaran', 'like', "%$cari%")
-								->get();
+			->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
+			->where('tgl_pembelajaran', 'like', "%$cari%")
+			->get();
 
 		// dd($data['jurnal']);
 
-		$this->log($request, 'melihat halaman monitoring jurnal '.$this->title);
+		$this->log($request, 'melihat halaman monitoring jurnal ' . $this->title);
 		return view('Jurnal::jurnal', array_merge($data, ['title' => $this->title]));
 	}
 
@@ -78,7 +73,7 @@ class JurnalController extends Controller
 		$query = Jurnal::get_jurnal_guru(Auth::id(), get_semester('active_semester_id'));
 		$data['data'] = $query->paginate(20)->withQueryString();
 
-		$this->log($request, 'melihat halaman manajemen data '.$this->title);
+		$this->log($request, 'melihat halaman manajemen data ' . $this->title);
 		return view('Jurnal::jurnal_guru', array_merge($data, ['title' => $this->title]));
 	}
 
@@ -86,8 +81,8 @@ class JurnalController extends Controller
 	{
 		$data_jurnal = Jurnal::get_detail_jurnal($id_jurnal);
 
-		$data['siswa']	= Presensi::get_presensi_by_idjurnal($data_jurnal->id);
-		$data['jurnal']	= $data_jurnal;
+		$data['siswa'] = Presensi::get_presensi_by_idjurnal($data_jurnal->id);
+		$data['jurnal'] = $data_jurnal;
 
 		$this->log($request, 'melihat halaman presensi jurnal');
 		return view('Jurnal::detail_jurnal', array_merge($data, ['title' => $this->title]));
@@ -97,23 +92,22 @@ class JurnalController extends Controller
 	{
 		$cek_jurnal = Jurnal::get_jurnal_by_idjadwal_and_date($request->get('id_jadwal'), date('Y-m-d'));
 
-		if($cek_jurnal)
-		{
+		if ($cek_jurnal) {
 			return redirect()->route('presensi.jurnal.index', $cek_jurnal->id)->with('message_success', 'Jurnal berhasil disimpan!');
 		}
 
 		$ref_jadwal = Jadwal::find($request->get('id_jadwal'));
-		
+
 		$data['forms'] = array(
-			'id_jadwal' => ['', Form::hidden("id_jadwal", $ref_jadwal->id, ["class" => "form-control"]) ],
-			'jadwal' => ['Jadwal', Form::text("jadwal", $ref_jadwal->mapel['mapel'], ["class" => "form-control", "disabled" => "disabled"]) ],
-			'tgl_pembelajaran' => ['Tanggal Pembelajaran', Form::date("tgl_pembelajaran", date('Y-m-d'), ["class" => "form-control"]) ],
-			'materi' => ['Materi', Form::textarea("materi", old("materi"), ["class" => "form-control rich-editor"]) ],
-			'catatan' => ['Catatan', Form::textarea("catatan", old("catatan"), ["class" => "form-control rich-editor"]) ],
-			
+			'id_jadwal' => ['', Form::hidden("id_jadwal", $ref_jadwal->id, ["class" => "form-control"])],
+			'jadwal' => ['Jadwal', Form::text("jadwal", $ref_jadwal->mapel['mapel'], ["class" => "form-control", "disabled" => "disabled"])],
+			'tgl_pembelajaran' => ['Tanggal Pembelajaran', Form::date("tgl_pembelajaran", date('Y-m-d'), ["class" => "form-control"])],
+			'materi' => ['Materi', Form::textarea("materi", old("materi"), ["class" => "form-control rich-editor"])],
+			'catatan' => ['Catatan', Form::textarea("catatan", old("catatan"), ["class" => "form-control rich-editor"])],
+
 		);
 
-		$this->log($request, 'membuka form tambah '.$this->title);
+		$this->log($request, 'membuka form tambah ' . $this->title);
 		return view('Jurnal::jurnal_create', array_merge($data, ['title' => $this->title]));
 	}
 
@@ -135,13 +129,12 @@ class JurnalController extends Controller
 		$jadwals = Jadwal::get_jadwal_by_kelas_mapel($request->input('id_kelas'), $request->input('id_mapel'), get_semester('active_semester_id'));
 		$jadwal = $jadwals->first();
 		// dd($jadwal);
-		$siswa	= Pesertadidik::get_pd_by_idkelas($request->input('id_kelas'), get_semester('active_semester_id'));
-		$status_kehadiran	= Statuskehadiran::get();
-		
+		$siswa = Pesertadidik::get_pd_by_idkelas($request->input('id_kelas'), get_semester('active_semester_id'));
+		$status_kehadiran = Statuskehadiran::get();
+
 		$id_jadwal = [];
-		foreach($jadwals as $jw)
-		{
-			array_push($id_jadwal,$jw->id_jadwal);
+		foreach ($jadwals as $jw) {
+			array_push($id_jadwal, $jw->id_jadwal);
 		}
 
 		// $pertemuan = $jadwals->pluck('id_jadwal', '');
@@ -153,18 +146,18 @@ class JurnalController extends Controller
 
 		// //buat array jurnal
 		$id_jurnal = [];
-		foreach($pertemuan as $jn)
-		{
+		foreach ($pertemuan as $jn) {
 			array_push($id_jurnal, $jn->id);
 		}
 
-		$presensi = Presensi::query()->whereIn('id_jurnal', $id_jurnal)->get();	
-		
+		$presensi = Presensi::query()->whereIn('id_jurnal', $id_jurnal)->get();
+
 		$spreadsheet = new Spreadsheet();
 		$styleArray = array(
-			'font'  => array(
-				 'name'  => 'Times New Roman'
-			 ));      
+			'font' => array(
+				'name' => 'Times New Roman'
+			)
+		);
 		$spreadsheet->getDefaultStyle()->applyFromArray($styleArray);
 
 		$activeWorksheet = $spreadsheet->getActiveSheet();
@@ -190,18 +183,18 @@ class JurnalController extends Controller
 		$drawing->setCoordinates('B1');
 		$drawing->setOffsetX(100);    // this is how
 		// $drawing->setOffsetY(3);    // this is how
-		
+
 		$activeWorksheet->mergeCells('M1:U1');
 		$activeWorksheet->getCell('M1')->setValue('F KUR-15');
 		$activeWorksheet->getStyle('M1')->getAlignment()->setHorizontal('right')->setVertical('center');
 		$activeWorksheet->getStyle("M1")->getFont()->setSize(12)->setBold(true);
-		
+
 		$activeWorksheet->mergeCells('M2:U5');
 		$activeWorksheet->getCell('M2')->setValue('DAFTAR HADIR');
 		$activeWorksheet->getStyle('M2')->getAlignment()->setHorizontal('center')->setVertical('center');
 		$activeWorksheet->getStyle("M2")->getFont()->setSize(16)->setBold(true);
 
-		
+
 		$activeWorksheet->getCell('B7')->setValue('Mata Pelajaran');
 		$activeWorksheet->getCell('C7')->setValue(':');
 		$activeWorksheet->mergeCells('D7:U7');
@@ -231,84 +224,70 @@ class JurnalController extends Controller
 		$row = 16;
 		$no = 1;
 		$min_pertemuan = 16;
-		foreach($siswa as $sis)
-		{
-			
+		foreach ($siswa as $sis) {
 
-			$activeWorksheet->getCell('A'.$row)->setValue($no);
-			$activeWorksheet->getCell('B'.$row)->setValue(strtoupper($sis->nama_siswa));
+
+			$activeWorksheet->getCell('A' . $row)->setValue($no);
+			$activeWorksheet->getCell('B' . $row)->setValue(strtoupper($sis->nama_siswa));
 
 			$sakit = 0;
-            $ijin = 0;
-            $alfa = 0;
+			$ijin = 0;
+			$alfa = 0;
 			$kolom = 'C';
 
 			// dd(count($pertemuan));
 
-			foreach($pertemuan as $jurnal)
-			{
-				
-				$id_status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first()->id_status_kehadiran;
+			foreach ($pertemuan as $jurnal) {
+
+				// $id_status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first()->id_status_kehadiran;
 				// dd($jurnal);
-				// $status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first();
-				// if($status)
-				// {
-					// 	$id_status = $status->id_status_kehadiran;
-					// }
-					// else{
-						// 	var_dump($sis->id);
-				// 	var_dump($jurnal->id);
-				// 	die();
-				// }
-
-            	$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
-
-				if($kehadiran == 'H')
-				{
-
+				$status = $presensi->where('id_pesertadidik', $sis->id)->where('id_jurnal', $jurnal->id)->first();
+				if ($status) {
+					$id_status = $status->id_status_kehadiran;
+				} else {
+					var_dump($sis->id);
+					var_dump($jurnal->id);
+					die();
 				}
-				else if($kehadiran == 'S')
-				{
+
+				$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
+
+				if ($kehadiran == 'H') {
+
+				} else if ($kehadiran == 'S') {
 					$sakit++;
-				}
-				else if($kehadiran == 'I')
-				{
+				} else if ($kehadiran == 'I') {
 					$ijin++;
-				}
-				else if($kehadiran == 'A')
-				{
+				} else if ($kehadiran == 'A') {
 					$alfa++;
 				}
 
-				$activeWorksheet->getCell($kolom.$row)->setValue($kehadiran);
+				$activeWorksheet->getCell($kolom . $row)->setValue($kehadiran);
 
-				
+
 
 
 
 				$kolom++;
-				
+
 
 			}
 
-			if(count($pertemuan) < $min_pertemuan)
-			{
+			if (count($pertemuan) < $min_pertemuan) {
 				$kurang = $min_pertemuan - count($pertemuan);
-			}
-			else{
+			} else {
 				$kurang = 0;
 			}
 
-			for($i = 1; $i <= $kurang; $i++)
-			{
-				$kolom ++;
+			for ($i = 1; $i <= $kurang; $i++) {
+				$kolom++;
 			}
 
-			$activeWorksheet->getCell($kolom.$row)->setValue($sakit);
+			$activeWorksheet->getCell($kolom . $row)->setValue($sakit);
 			$kolom++;
-			$activeWorksheet->getCell($kolom.$row)->setValue($ijin);
+			$activeWorksheet->getCell($kolom . $row)->setValue($ijin);
 			$kolom++;
-			$activeWorksheet->getCell($kolom.$row)->setValue($alfa);
+			$activeWorksheet->getCell($kolom . $row)->setValue($alfa);
 			$kolom++;
 
 
@@ -327,32 +306,29 @@ class JurnalController extends Controller
 		//mulai presensi
 		$kolom = 'B';
 		$no = 1;
-		
-		foreach($pertemuan as $pert)
-		{
+
+		foreach ($pertemuan as $pert) {
 			$kolom++;
-			$activeWorksheet->getCell($kolom.'13')->setValue($no);
-			$activeWorksheet->getCell($kolom.'14')->setValue($pert->tgl_pembelajaran);
-			$activeWorksheet->getStyle($kolom.'14')->getAlignment()->setTextRotation(90);
+			$activeWorksheet->getCell($kolom . '13')->setValue($no);
+			$activeWorksheet->getCell($kolom . '14')->setValue($pert->tgl_pembelajaran);
+			$activeWorksheet->getStyle($kolom . '14')->getAlignment()->setTextRotation(90);
 			$no++;
 		}
 
-		if(count($pertemuan) < $min_pertemuan)
-		{
+		if (count($pertemuan) < $min_pertemuan) {
 			$kurang = $min_pertemuan - count($pertemuan);
 		}
 
-		for($i = 1; $i <= $kurang; $i++)
-		{
-			$kolom ++;
-			$activeWorksheet->getCell($kolom.'13')->setValue($no);
+		for ($i = 1; $i <= $kurang; $i++) {
+			$kolom++;
+			$activeWorksheet->getCell($kolom . '13')->setValue($no);
 			$no++;
 		}
 
-		
 
 
-		$activeWorksheet->mergeCells('C12:'.$kolom.'12');
+
+		$activeWorksheet->mergeCells('C12:' . $kolom . '12');
 		$activeWorksheet->getCell('C12')->setValue('PERTEMUAN KE-');
 		$activeWorksheet->getStyle('C12')->getAlignment()->setHorizontal('center')->setVertical('center');
 
@@ -366,53 +342,48 @@ class JurnalController extends Controller
 		$kolom_jumlah = $kolom;
 		$kolom++;
 
-		for($i = 1; $i <= 3; $i++)
-		{
+		for ($i = 1; $i <= 3; $i++) {
 			$kolom_jumlah++;
-			if($i == 1)
-			{
-				$activeWorksheet->getCell($kolom_jumlah.'15')->setValue('S');
+			if ($i == 1) {
+				$activeWorksheet->getCell($kolom_jumlah . '15')->setValue('S');
+			} else if ($i == 2) {
+				$activeWorksheet->getCell($kolom_jumlah . '15')->setValue('I');
+			} else {
+				$activeWorksheet->getCell($kolom_jumlah . '15')->setValue('A');
 			}
-			else if($i == 2)
-			{
-				$activeWorksheet->getCell($kolom_jumlah.'15')->setValue('I');
-			}
-			else{
-				$activeWorksheet->getCell($kolom_jumlah.'15')->setValue('A');
-			}
-			
-			
+
+
 		}
 
 		// dd($kolom_jumlah);
 
-		$activeWorksheet->mergeCells($kolom.'12:'.$kolom_jumlah.'14');
-		$activeWorksheet->getCell($kolom.'12')->setValue('JUMLAH');
-		$activeWorksheet->getStyle($kolom.'12')->getAlignment()->setHorizontal('center')->setVertical('center');
+		$activeWorksheet->mergeCells($kolom . '12:' . $kolom_jumlah . '14');
+		$activeWorksheet->getCell($kolom . '12')->setValue('JUMLAH');
+		$activeWorksheet->getStyle($kolom . '12')->getAlignment()->setHorizontal('center')->setVertical('center');
 		$kolom_jumlah++;
-		$activeWorksheet->getCell($kolom_jumlah.'12')->setValue('');
+		$activeWorksheet->getCell($kolom_jumlah . '12')->setValue('');
 		$kolom++;
 		$kolom++;
 		$row--;
-		
+
 
 		// dd($kolom);
 
 		$activeWorksheet->getStyle('B1:U5')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
-		$activeWorksheet->getStyle('A12:'.$kolom.$row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+		$activeWorksheet->getStyle('A12:' . $kolom . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
 
 
-		for ($i = 'A'; $i !=  $activeWorksheet->getHighestColumn(); $i++) {
+		for ($i = 'A'; $i != $activeWorksheet->getHighestColumn(); $i++) {
 			$activeWorksheet->getColumnDimension($i)->setAutoSize(TRUE);
 		}
 
-		
+
 
 		$writer = new Xlsx($spreadsheet);
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'. urlencode('Daftar_hadir-'.$jadwal->kelas.'-'.$jadwal->mapel.'.xlsx').'"');
-        $writer->save('php://output');
-		
+		header('Content-Disposition: attachment; filename="' . urlencode('Daftar_hadir-' . $jadwal->kelas . '-' . $jadwal->mapel . '.xlsx') . '"');
+		$writer->save('php://output');
+
 	}
 
 	public function aksi_cetak_presensi2(Request $request)
@@ -421,30 +392,28 @@ class JurnalController extends Controller
 		$data['jadwal'] = $jadwals->first();
 		// dd($data['jadwal']);
 		// $data['siswa']	= Pesertadidik::query()->where('id_kelas', $request->input('id_kelas'))->where('id_semester',get_semester('active_semester_id'))->get();
-		$data['siswa']	= Pesertadidik::get_pd_by_idkelas($request->input('id_kelas'), get_semester('active_semester_id'));
-		$data['status_kehadiran']	= Statuskehadiran::get();
+		$data['siswa'] = Pesertadidik::get_pd_by_idkelas($request->input('id_kelas'), get_semester('active_semester_id'));
+		$data['status_kehadiran'] = Statuskehadiran::get();
 		// dd($data['status_kehadiran']);
 
 		//buat array jadwal
 		$jadwal = [];
-		foreach($jadwals as $jw)
-		{
-			array_push($jadwal,$jw->id_jadwal);
+		foreach ($jadwals as $jw) {
+			array_push($jadwal, $jw->id_jadwal);
 		}
 
 		$data['jurnal'] = Jurnal::query()->whereIn('id_jadwal', $jadwal)->orderBy('tgl_pembelajaran')->get();
 
 		//buat array jurnal
 		$jurnal = [];
-		foreach($data['jurnal'] as $jn)
-		{
+		foreach ($data['jurnal'] as $jn) {
 			array_push($jurnal, $jn->id);
 		}
 
-		$data['presensi'] = Presensi::query()->whereIn('id_jurnal', $jurnal)->get();		
-		
+		$data['presensi'] = Presensi::query()->whereIn('id_jurnal', $jurnal)->get();
+
 		return view('Jurnal::cetak_presensi', $data);
-		
+
 	}
 
 	public function cetak_jurnalmengajar(Request $request)
@@ -453,15 +422,15 @@ class JurnalController extends Controller
 		$data['detail_jadwal'] = $data['jadwal']->first();
 		$id_jadwal = $data['jadwal']->pluck('id_jadwal')->toArray();
 
-		
-		$data['jurnal']	= Jurnal::get_jurnal($id_jadwal);
-		
+
+		$data['jurnal'] = Jurnal::get_jurnal($id_jadwal);
+
 		return view('Jurnal::jurnal_mengajar', $data);
 
 		// $pdf = PDF::loadview('Jurnal::jurnal_mengajar',$data);
-    	// return $pdf->download('BiodataPesertaUjian');
+		// return $pdf->download('BiodataPesertaUjian');
 
-		
+
 	}
 
 	function store(Request $request)
@@ -470,7 +439,7 @@ class JurnalController extends Controller
 			'id_jadwal' => 'required',
 			'materi' => 'required',
 			'tgl_pembelajaran' => 'required'
-			
+
 		]);
 
 		// dd($request);
@@ -480,11 +449,11 @@ class JurnalController extends Controller
 		$jurnal->materi = $request->input("materi");
 		$jurnal->tgl_pembelajaran = $request->input("tgl_pembelajaran");
 		$jurnal->catatan = $request->input("catatan");
-		
+
 		$jurnal->created_by = Auth::id();
 		$jurnal->save();
 
-		$text = 'membuat '.$this->title; //' baru '.$jurnal->what;
+		$text = 'membuat ' . $this->title; //' baru '.$jurnal->what;
 		$this->log($request, $text, ['jurnal.id' => $jurnal->id]);
 		// return redirect()->route('jurnal.index')->with('message_success', 'Jurnal berhasil ditambahkan!');
 		return redirect()->route('presensi.jurnal.index', $jurnal->id)->with('message_success', 'Jurnal berhasil disimpan!');
@@ -494,7 +463,7 @@ class JurnalController extends Controller
 	{
 		$data['jurnal'] = $jurnal;
 
-		$text = 'melihat detail '.$this->title;//.' '.$jurnal->what;
+		$text = 'melihat detail ' . $this->title;//.' '.$jurnal->what;
 		$this->log($request, $text, ['jurnal.id' => $jurnal->id]);
 		return view('Jurnal::jurnal_detail', array_merge($data, ['title' => $this->title]));
 	}
@@ -504,16 +473,16 @@ class JurnalController extends Controller
 		$data['jurnal'] = $jurnal;
 
 		$ref_jadwal = Jadwal::find($jurnal->id_jadwal);
-		
+
 		$data['forms'] = array(
-			'id_jadwal' => ['Jadwal', Form::text("id_jadwal", $ref_jadwal->mapel['mapel'], ["class" => "form-control", "disabled"]) ],
-			'materi' => ['Materi', Form::textarea("materi", $jurnal->materi, ["class" => "form-control rich-editor"]) ],
-			'tgl_pembelajaran' => ['Tgl Pembelajaran', Form::date("tgl_pembelajaran", $jurnal->tgl_pembelajaran, ["class" => "form-control", "id" => "tgl_pembelajaran"]) ],
-			'catatan' => ['Catatan', Form::textarea("catatan", $jurnal->catatan, ["class" => "form-control rich-editor"]) ],
-			
+			'id_jadwal' => ['Jadwal', Form::text("id_jadwal", $ref_jadwal->mapel['mapel'], ["class" => "form-control", "disabled"])],
+			'materi' => ['Materi', Form::textarea("materi", $jurnal->materi, ["class" => "form-control rich-editor"])],
+			'tgl_pembelajaran' => ['Tgl Pembelajaran', Form::date("tgl_pembelajaran", $jurnal->tgl_pembelajaran, ["class" => "form-control", "id" => "tgl_pembelajaran"])],
+			'catatan' => ['Catatan', Form::textarea("catatan", $jurnal->catatan, ["class" => "form-control rich-editor"])],
+
 		);
 
-		$text = 'membuka form edit '.$this->title;//.' '.$jurnal->what;
+		$text = 'membuka form edit ' . $this->title;//.' '.$jurnal->what;
 		$this->log($request, $text, ['jurnal.id' => $jurnal->id]);
 		return view('Jurnal::jurnal_update', array_merge($data, ['title' => $this->title]));
 	}
@@ -523,19 +492,19 @@ class JurnalController extends Controller
 		$this->validate($request, [
 			'materi' => 'required',
 			'tgl_pembelajaran' => 'required'
-			
+
 		]);
-		
+
 		$jurnal = Jurnal::find($id);
 		$jurnal->materi = $request->input("materi");
 		$jurnal->tgl_pembelajaran = $request->input("tgl_pembelajaran");
 		$jurnal->catatan = $request->input("catatan");
-		
+
 		$jurnal->updated_by = Auth::id();
 		$jurnal->save();
 
 
-		$text = 'mengedit '.$this->title;//.' '.$jurnal->what;
+		$text = 'mengedit ' . $this->title;//.' '.$jurnal->what;
 		$this->log($request, $text, ['jurnal.id' => $jurnal->id]);
 		return redirect()->route('jurnal.index')->with('message_success', 'Jurnal berhasil diubah!');
 	}
@@ -547,7 +516,7 @@ class JurnalController extends Controller
 		$jurnal->save();
 		$jurnal->delete();
 
-		$text = 'menghapus '.$this->title;//.' '.$jurnal->what;
+		$text = 'menghapus ' . $this->title;//.' '.$jurnal->what;
 		$this->log($request, $text, ['jurnal.id' => $jurnal->id]);
 		return back()->with('message_success', 'Jurnal berhasil dihapus!');
 	}
