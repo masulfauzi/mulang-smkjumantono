@@ -246,9 +246,8 @@ class JurnalController extends Controller
 				if ($status) {
 					$id_status = $status->id_statuskehadiran;
 				} else {
-					var_dump($sis->id);
-					var_dump($jurnal->id);
-					die();
+					$jadwal = Jadwal::find($jurnal->id_jadwal);
+					echo "Jadwal dengan ID: " . $jadwal->id . " Tidak singkron. silahkan ubah kelas.";
 				}
 
 				$kehadiran = $status_kehadiran->where('id', $id_status)->first()->status_kehadiran_pendek;
