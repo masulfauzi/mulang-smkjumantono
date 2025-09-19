@@ -47,6 +47,7 @@
                             <thead>
                                 <tr>
                                     <th width="15">No</th>
+                                    <td>ID Jadwal</td>
                                     <td>Guru</td>
                                     <td>Mapel</td>
                                     <td>Kelas</td>
@@ -62,6 +63,7 @@
                                 @forelse ($data as $item)
                                     <tr>
                                         <td>{{ $no++ }}</td>
+                                        <td>{{ $item->id }}</td>
                                         <td>{{ $item->nama }}</td>
                                         <td>{{ $item->mapel }}</td>
                                         <td>{{ $kelas[$item->id_kelas] }}</td>
