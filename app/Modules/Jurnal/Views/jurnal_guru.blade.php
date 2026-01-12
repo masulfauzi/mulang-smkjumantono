@@ -27,7 +27,14 @@
                 Tabel Data {{ $title }}
             </h6>
             <div class="card-body">
-                
+                <div class="row">
+                    <div class="col-9">
+                        
+                    </div>
+                    <div class="col-3">  
+						{!! button('jurnal.create', $title) !!}  
+                    </div>
+                </div>
                 @include('include.flash')
                 <div class="table-responsive-md col-12">
                     <table class="table" id="table1">
