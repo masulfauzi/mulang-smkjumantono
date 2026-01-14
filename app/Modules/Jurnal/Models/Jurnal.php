@@ -68,25 +68,47 @@ class Jurnal extends Model
 
     public static function get_mapel_guru($id_guru, $id_semester)
     {
-        return DB::table('jadwal as a')
-            ->select('b.id', 'b.mapel')
-            ->join('mapel as b', 'a.id_mapel', '=', 'b.id')
-            ->where('a.id_guru', $id_guru)
-            ->where('a.id_semester', $id_semester)
-            ->orderBy('b.mapel')
+        return DB::table('jurnal as j')
+            ->select('m.id', 'm.mapel')
+            ->join('mapel as m', 'j.id_mapel', '=', 'm.id')
+            ->where('j.id_guru', $id_guru)
+            ->where('j.id_semester', $id_semester)
+            ->orderBy('m.mapel')
             ->get();
     }
 
+    // public static function get_mapel_guru($id_guru, $id_semester)
+    // {
+    //     return DB::table('jadwal as a')
+    //         ->select('b.id', 'b.mapel')
+    //         ->join('mapel as b', 'a.id_mapel', '=', 'b.id')
+    //         ->where('a.id_guru', $id_guru)
+    //         ->where('a.id_semester', $id_semester)
+    //         ->orderBy('b.mapel')
+    //         ->get();
+    // }
+
     public static function get_kelas_guru($id_guru, $id_semester)
     {
-        return DB::table('jadwal as a')
-            ->select('b.id', 'b.kelas')
-            ->join('kelas as b', 'a.id_kelas', '=', 'b.id')
-            ->where('a.id_guru', $id_guru)
-            ->where('a.id_semester', $id_semester)
-            ->orderBy('b.kelas')
+        return DB::table('jurnal as j')
+            ->select('k.id', 'k.kelas')
+            ->join('kelas as k', 'j.id_kelas', '=', 'k.id')
+            ->where('j.id_guru', $id_guru)
+            ->where('j.id_semester', $id_semester)
+            ->orderBy('k.kelas')
             ->get();
     }
+
+    // public static function get_kelas_guru($id_guru, $id_semester)
+    // {
+    //     return DB::table('jadwal as a')
+    //         ->select('b.id', 'b.kelas')
+    //         ->join('kelas as b', 'a.id_kelas', '=', 'b.id')
+    //         ->where('a.id_guru', $id_guru)
+    //         ->where('a.id_semester', $id_semester)
+    //         ->orderBy('b.kelas')
+    //         ->get();
+    // }
 
     public static function get_jurnal($id_jadwal)
     {

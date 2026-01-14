@@ -419,9 +419,10 @@ class JurnalController extends Controller
     {
         $data['jadwal']        = Jadwal::get_jadwal_by_kelas_mapel($request->input('id_kelas'), $request->input('id_mapel'), get_semester('active_semester_id'));
         $data['detail_jadwal'] = $data['jadwal']->first();
-        $id_jadwal             = $data['jadwal']->pluck('id_jadwal')->toArray();
+        $data['jam_pelajaran'] = Jampelajaran::all()->sortBy('jam_pelajaran')->pluck('jam_pelajaran', 'id');
+        $data['jurnal']        = $data['jadwal'];
 
-        $data['jurnal'] = Jurnal::get_jurnal($id_jadwal);
+        // dd($data['jurnal']);
 
         return view('Jurnal::jurnal_mengajar', $data);
 

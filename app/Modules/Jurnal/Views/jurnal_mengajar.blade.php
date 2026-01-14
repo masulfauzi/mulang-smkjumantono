@@ -67,7 +67,7 @@ window.close();
         @foreach ($jurnal as $item)
             <tr class="border">
                 <td class="border">{{ \App\Helpers\Format::tanggal($item->tgl_pembelajaran) }}</td>
-                <td class="border center">{{ $item->jam_mulai }} - {{ $item->jam_selesai }}</td>
+                <td class="border center">{{ $jam_pelajaran[$item->jam_mulai] }} - {{ $jam_pelajaran[$item->jam_selesai] }}</td>
                 <td class="border">{!! $item->materi !!}</td>
                 <td class="border">{!! $item->catatan !!}</td>
             </tr>
