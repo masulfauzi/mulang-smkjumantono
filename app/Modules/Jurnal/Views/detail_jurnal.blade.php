@@ -38,12 +38,12 @@
                         <tr>
                             <th>Mapel</th>
                             <td>:</td>
-                            <td>{{ $jurnal->mapel }}</td>
+                            <td>{{ $jurnal->mapel->mapel }}</td>
                         </tr>
                         <tr>
                             <th>Kelas</th>
                             <td>:</td>
-                            <td>{{ $jurnal->kelas }}</td>
+                            <td>{{ $jurnal->kelas->kelas }}</td>
                         </tr>
                         <tr>
                             <th>Materi</th>

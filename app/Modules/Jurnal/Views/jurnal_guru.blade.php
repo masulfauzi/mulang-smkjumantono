@@ -55,8 +55,8 @@
                             @forelse ($data as $item)
                                 <tr>
                                     <td>{{ $no++ }}</td>
-                                    <td>{{ $item->mapel }}</td>
-                                    <td>{{ $item->kelas }}</td>
+                                    <td>{{ $item->mapel->mapel }}</td>
+                                    <td>{{ $item->kelas->kelas }}</td>
 									<td>{!! $item->materi !!}</td>
 									<td>{{ \App\Helpers\Format::tanggal($item->tgl_pembelajaran, 1); }}</td>
 									<td>{!! $item->catatan !!}</td>

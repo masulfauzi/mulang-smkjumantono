@@ -69,16 +69,16 @@ class JurnalController extends Controller
 
     public function index_guru(Request $request)
     {
-        $query        = Jurnal::get_jurnal_guru(Auth::id(), get_semester('active_semester_id'));
+        $query        = Jurnal::where('id_guru', session('id_guru'));
         $data['data'] = $query->paginate(20)->withQueryString();
 
         $this->log($request, 'melihat halaman manajemen data ' . $this->title);
         return view('Jurnal::jurnal_guru', array_merge($data, ['title' => $this->title]));
     }
 
-    public function detail_jurnal(Request $request, $id_jurnal)
+    public function detail_jurnal(Request $request, Jurnal $jurnal)
     {
-        $data_jurnal = Jurnal::get_detail_jurnal($id_jurnal);
+        $data_jurnal = $jurnal;
 
         $data['siswa']  = Presensi::get_presensi_by_idjurnal($data_jurnal->id);
         $data['jurnal'] = $data_jurnal;
