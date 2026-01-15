@@ -57,7 +57,7 @@ class JurnalController extends Controller
 
         $cari           = $data['tahun'] . "-" . $data['bulan'];
         $data['jurnal'] = Jurnal::query()
-            ->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
+        // ->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
             ->where('tgl_pembelajaran', 'like', "%$cari%")
             ->get();
 
