@@ -92,9 +92,9 @@
                                         @for ($i = 1; $i <= 31; $i++)
                                             @php
                                                 if ($i < 10) {
-                                                    $tgl = date('Y') . '-' . $bulan_terpilih . '-' . '0' . $i;
+                                                    $tgl = $tahun_terpilih . '-' . $bulan_terpilih . '-' . '0' . $i;
                                                 } else {
-                                                    $tgl = date('Y') . '-' . $bulan_terpilih . '-' . $i;
+                                                    $tgl = $tahun_terpilih . '-' . $bulan_terpilih . '-' . $i;
                                                 }
                                             @endphp
 
