@@ -221,8 +221,9 @@ class PresensiController extends Controller
     {
         $data['kelas_terpilih'] = $request->get('id_kelas');
         $data['bulan_terpilih'] = $request->get('bulan');
+        $data['tahun_terpilih'] = $request->get('tahun', date('Y'));
 
-        $filter_bulan = date('Y') . '-' . $request->get('bulan') . '%';
+        $filter_bulan = $data['tahun_terpilih'] . '-' . $request->get('bulan') . '%';
 
         // dd($filter_bulan);
 

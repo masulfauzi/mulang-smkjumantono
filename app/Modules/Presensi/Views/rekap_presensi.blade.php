@@ -31,13 +31,23 @@
                         <div class="col-12">
                             <form action="" method="get" class="form form-horizontal">
                                 <div class="row">
-                                    <div class="col-md-5">
+                                    <div class="col-md-4">
                                         {{ Form::select('id_kelas', $kelas, $kelas_terpilih, ['class' => 'form-control select2']) }}
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         {{ Form::select('bulan', $bulan, $bulan_terpilih, ['class' => 'form-control select2']) }}
                                     </div>
                                     <div class="col-md-3">
+                                        @php
+                                            $year_now = date('Y');
+                                            $years = [];
+                                            for ($y = 2025; $y <= $year_now; $y++) {
+                                                $years[$y] = $y;
+                                            }
+                                        @endphp
+                                        {{ Form::select('tahun', $years, request('tahun', $year_now), ['class' => 'form-control select2']) }}
+                                    </div>
+                                    <div class="col-md-2">
                                         <button type="submit" class="btn btn-primary">Lihat Data</button>
                                         @if ($kelas_terpilih)
                                             <a target="_blank"
