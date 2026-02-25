@@ -55,11 +55,19 @@ class JurnalController extends Controller
 
         $data['guru'] = Guru::query()->whereIsAktif('1')->orderBy('nama')->get();
 
-        $cari           = $data['tahun'] . "-" . $data['bulan'];
-        $data['jurnal'] = Jurnal::query()
-        // ->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
-            ->where('tgl_pembelajaran', 'like', "%$cari%")
-            ->get();
+        $cari = $data['tahun'] . "-" . $data['bulan'];
+
+        if ($request->input('tahun') > 2025) {
+            $data['jurnal'] = Jurnal::query()
+            // ->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
+                ->where('tgl_pembelajaran', 'like', "%$cari%")
+                ->get();
+        } else {
+            $data['jurnal'] = Jurnal::query()
+                ->join('jadwal', 'jadwal.id', '=', 'jurnal.id_jadwal')
+                ->where('tgl_pembelajaran', 'like', "%$cari%")
+                ->get();
+        }
 
         // dd($data['jurnal']);
 
@@ -69,7 +77,7 @@ class JurnalController extends Controller
 
     public function index_guru(Request $request)
     {
-        $query        = Jurnal::where('id_guru', session('id_guru'));
+        $query        = Jurnal::where('id_guru', session('id_guru'))->orderBy('tgl_pembelajaran', 'desc');
         $data['data'] = $query->paginate(20)->withQueryString();
 
         $this->log($request, 'melihat halaman manajemen data ' . $this->title);
